@@ -1,2 +1,2 @@
-# The-Zodiac-Killer
-Math 5347 paper on the zodiac killer.
+# Cryptosystems
+Math 5347 final paper on various cryptosytems.
