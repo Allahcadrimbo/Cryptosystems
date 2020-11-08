@@ -1,3 +1,250 @@
-\documentclass{article}
+\documentclass[12pt]{article}
+
+
+\usepackage{amsthm, amsmath,amssymb}
+\usepackage{enumerate}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{float}
+
+
 \begin{document}
+
+\author{Grant Mitchell}
+\title{Cryptosystems}
+\maketitle
+\newpage
+
+\section{Substitution Cipher}
+
+\subsection{Description}
+A substitution cipher is one of the simplest encryption schemes possible. In a substitution scheme, a letter in the plaintext is replaced by another letter or even a symbol. In fact, a letter could even be replaced by multiple symbols [\ref{simmons}]. One of the most well known and simplest substitution ciphers is the Caesar cipher, which was used at one point by Julie Caesar as you may have guessed [\ref{class}]. The Caesar cipher is a mono-alphabetic substitution cipher, which is also referred to as a simple substitution cipher [\ref{rodriguez}]. When we say a cipher is mono-alphabetic, we mean to say it relies on a fixed replacement structure. This means that every unique letter in the plaintext is replaced by the same ciphertext letter or symbol every time [\ref{rodriguez}]. A Caesar cipher is one of the simplest substitution ciphers because it is a cyclical shift of the plaintext alphabet and it is mono-alphabetic. It is a cyclical shift because to get the ciphertext replacement value you just shift $x$ letters in the plaintext alphabet from the letter you are encrypting [\ref{class}]. There are also poly-alphabetic substitution ciphers like the Vigenère cipher but we discuss that later on. Below is an example of a Caesar cipher with a shift of 3:
+\begin{center}
+    Plaintext Alphabet: ABCDEFGHIJKLMNOPQRSTUVWXYZ\\
+    Ciphertext Alphabet: DEFGHIJKLMNOPQRSTUVWXYZABC\\
+    \;\;Plaintext: \;\;\;\;\;how are you ...\\
+    Ciphertext: KRZ DUH BRX\\
+\end{center}
+It is important to note that not only can substitution schemes be comprised of cyclical shifts, but also by using key words or phrases [\ref{class}]. In this type of scheme you would take your key and write it under your plaintext. Once your keyword ends you continue the rest of the alphabet. Each letter below the plaintext letter will be its corresponding substitution letter. Below is an example of this idea with the keyword HIGHLANDER:
+\begin{center}
+    \hspace{1cm} Plaintext: abcdefghijklmnopqrstuvwxyz\\
+    Keyword: \;HIGHLANDERBCFJ...\\
+    Ciphertext: HIGHLANDERBCFJ...\\
+\end{center}
+\subsection{Attacks}
+The main flaw with simple substitution ciphers is that although they change the plaintext letters to something else, the frequency of those symbols do not change [\ref{class}]. What this means is that we can fairly reasonably perform a frequency analysis attack on these types of ciphers. In different plaintext languages (we'll use English for our explanation) different letter and letter groupings occur at different frequencies [\ref{class}]. For example the letter $`E`$ is the most common letter in the English language. With this knowledge you could look at the ciphertext and reasonably guess the most frequent letter in the ciphertext would be an $`E`$ in plaintext [\ref{class}]. We can use this same idea for different letters and patterns, which allows us to make educated guesses to slowly break the cipher. 
+
+
+%%%%%%
+\section{Diffie-Hellman Key Exchange}
+
+\subsection{Description}
+The Diffie-Hellman Key Exchange, as the name implies, is a way for two parties to securely generate a secret key to be shared between the both of them. To be extra clear D-H doesn't share any information. It is only a means of creating a shared key between the involved parties [\ref{class}]. Later on, we will discuss crypotsystems that depend on a secret key shared between the parties. If the parties can't securely share/create a key then their entire cryptosystem is insecure. D-H is important because it allows for secure key creation that can be done all while having the exchange be public. Like in many other systems, a trap door function is used in D-H [\ref{tyler}]. A trapdoor function is one that is relatively easy to compute, but fairly difficult to compute it's inverse. In D-H's case the discrete logarithm problem is leveraged [\ref{class}]. The discrete log problem is as follows:
+\vspace{3mm}\\
+Given a cyclic group G = $\langle g \rangle$ and $a \in G$, find an $n \in Z$ so that $g^n = a\;(mod\;p)$
+\vspace{.5mm}\\
+This problem isn't always hard to solve but it can become very difficult when a very large prime is chosen [\ref{daileda}]. Below we will walk through the steps to create the key between two parties (Alice and Bob) [\ref{class}]: \\
+\begin{enumerate}
+  \item Public Parameter Creation: Alice chooses and publishes a large prime number $`p`$ and and integer $`g`$ having large prime order in $\mathbb{F}_p^{\times}$ ($`g`$ being a primitive root is optimal).
+  \item Private computations: \\
+    - Alice chooses a secret integer $`a`$ and computes $A\equiv g^a\;(mod\;p)$\\
+    - Bob chooses a secret integer $`b`$ and computes $B\equiv g^b\;(mod\;p)$\\
+  \item Publicly Exchange Values:\\
+  - Alice sends $`A`$ to Bob.\\
+  - Bob sends $`B`$ to Alice.
+  \item Further Private Computations:\\
+  - Alice computes $B^a \equiv {(g^b)}^a \equiv g^{ab}\;(mod\;p)$\\
+  - Bob computes $A^b \equiv {(g^a)}^b \equiv g^{ab}\;(mod\;p)$ \\
+  - This is their shared value.
+\end{enumerate}
+
+One final comment to sum everything up is that an devious onlooker knows $`A`$, $`B`$, $`g`$, and $`p`$. They do not need to know $`a`$ and $`b`$ specifically, but be able to compute $g^{ab}\;(mod\;p)$ [\ref{class}].
+%\subsection{Attacks}. You can skip attacks for the Diffie-Hellman Key Exchange (they will be similar to that under ElGamal).
+
+%%%%%%
+\section{ElGamal}
+
+\subsection{Description}
+ElGamal is an asymmetric key encryption algorithm for public-key cryptography that is heavily inspired by the Diffie-Hellman key exchange, and was first described by Taher Elgamal in 1985 [\ref{gamal}]. ElGamal is a hybrid cryptosystem, which means that key encapsulation is done via a public-key cryptosystem and data encapsulation is done via a symmetric-key cryptosystem [\ref{iastate}]. Now what is public-key cryptography (PKC)? PKC is a system where each party in the system has two keys [\ref{class}]. One key is the public key, which is openly known by all. The second key is the private key, which is known only to the owner of the key. In PKC when you want to send a message to another party you encrypt it with that party's public key. Then the only way that message can be decrypted is with that party's private key. As mentioned above ElGamal is based off of D-H so it also relies on the difficulty of finding the discrete logarithm in a cyclic group. ElGamal can be broken down into three main parts, and they are as follows key generation, encryption, and decryption [\ref{class}]. Below is a walk through of the ElGamal Encryption Algorithm where Bob wants to communicate with Alice [\ref{class}]:\\
+\begin{enumerate}
+  \item Key Generation: \\
+    - Alice chooses a large prime $p$.\\
+    - A primitive element $g$ modulo $p$.\\
+    - A random number $a$ such that $1\leq a\leq p-1$.\\
+    - Alice computes $A\equiv g^a\;(mod\;p)$. \\
+    - She publishes $A,g,p$.
+  \item Encryption:\\
+  - Bob chooses a plaintext message $m$ in the form of a number such that $1\leq m\leq p-1$.\\
+  - He chooses a random key $k\;(mod\;p)$, which he keeps a secret.\\
+  - Bob computes $C_1\equiv g^k\;(mod\;p) and C_2\equiv mA^k\;(mod\;p)$.\\
+  - He sends his encrypted message $(C_1,\;C_2)$ to Alice.
+  \item Decryption:\\
+  - Alice computes $x\equiv {C_1}^a\;(mod\;p)$.\\
+  - She uses the Euclidean Algorithm to find $x^{-1}\;(mod\;p)$.\\
+  - Then computes $({C_1}^a)^{-1}(C_2)\equiv(g^{ak})^{-1}(mA^k)\equiv(g^{ak})^{-1}(mg^{ak})\equiv m(g^{ak})^{-1}(g^{ak})\equiv m\;(mod\;p)$.
+\end{enumerate}
+Even if a third party intercepts the ciphertext they cannot perform the calculation to decipher the text because they do not know $a$. The third party can find $a$ if they can compute a discrete log in the large modulus $p$, which is impractical [\ref{uicmath}]. 
+\subsection{Attacks}
+One possible attack on ElGamal is a brute force attack. Now because ElGamal is a hybrid cryptosystem there are few possible brute force attacks and they are as follows:
+\begin{enumerate}
+  \item Asymmetric Key Brute Force [\ref{iastate}]: \\
+    - There are $p-1$ possible values for the private key $a$.\\
+    - We can compute all potential values for $a$ and check if that successfully decrypts the message.\\
+    - We could also compute all possible encryptions of all possible messages until one is found that matches the ciphertext.
+  \item Symmetric Key Brute Force [\ref{iastate}]:\\
+    - Since the data in ElGamal is encapsulated with a symmetric cipher we could decrypt the ciphertext with all possible session keys until we find one that looks like a reasonable plaintext.
+\end{enumerate}
+It is important to note that none of the brute force attacks are very efficient or practical.\vspace{5mm}\\ Another possible attack on ElGamal is a Meet-In-The-Middle Attack, which requires the attacker to know $(C_1,\;C_2)$ and $A,g,p$ [\ref{iastate}]. MITM is a type of chosen cipher text attack. ElGamal is non-deterministic, since a random $a$ is chosen each time, which means encrypting the same plaintext multiple times will result in a different ciphertext every time [\ref{iastate}]. This means that $A^k$ (non-deterministic) has order dividing $a$. With that knowledge if we raise $C_2=mA^k$ to the $a$ power we get rid of $A^k$ [\ref{iastate}]. From here you could brute force search for a message $M$, where $M^a={C_2}^a$, but this would take a very long time so an idea of splitting is introduced. You can limit your search to just message $M$ which can be factored as $M=M_1M_2$ with $M_1\leq2^{b_1}$ and $M_2\leq2^{b_2}$. $b_1+b_2$ is the bit length of the message. From all of this we can state that $(C_2)^a(M_2)^{-a}=(M_1)^a$ [\ref{iastate}]. From here the idea is to compute $(M_1)^a$ and store the key/value pairs in a dictionary. Then we can compute $(C_2)^a(M_2)^{-a}$ and look up the values in the dictionary. If a match exists then these $M_1$ and $M_2$ are potential candidates [\ref{iastate}].     
+
+
+%%%%%%
+\section{RSA}
+
+\subsection{Description}
+RSA was developed in 1977 by Ron Rivest with the help of Adi Shamir and Leonard Adleman. RSA was one of the first public-key cryptosystems ever created. They devised a way to have a one-way function that was only reversible if the receiver had some special information [\ref{chicago}]. RSA is based on the fact that calculating Euler's Totient Function $\phi(n)$ when $n$ is prime or $n$ is a small number is easy, but when $n$ is a random large number it can become very difficult [\ref{class}]. To ensure $\phi(n)$ is difficult to compute we let $n=p*q$ where $p$ and $q$ are very large prime numbers. This then means $\phi(p*q)=\phi(p)\phi(q)=(p-1)(q-1)$ [\ref{class}]. The following is a walk through of RSA where Bob wants to send a message to Alice [\ref{class}]:\\
+\begin{enumerate}
+  \item Key Creation: \\
+    - Alice chooses two large secret primes $p$ and $q$. \\
+    - Alice chooses an encryption exponent $e$ such that $gcd(e,\;\phi(n)=1)$ where $n=p*q$. She can use the Euclidean Algorithm to help her find $e$.
+    - She publishes $n,\;e$.
+  \item Encryption:\\
+    - Bob chooses a plaintext $m$.\\
+    - He computes $C\equiv m^e\;(mod\;n)$.\\
+    - Bob publishes $C$ .
+  \item Decryption:\\
+    - Alice computes $d$ satisfying $ed\equiv1\;(mod\;n)$ (Uses Euclidean Algorithm).\\
+    - She computes $C^d\equiv m\;(mod\;n)$.
+\end{enumerate}
+\subsection{Attacks}
+There are numerous attacks that are possible on RSA, and the following are a few of them:\\
+- When performing RSA with small values for $e,\;p,\;and\;q$ it can be easily deciphered by performing Euler's Totient Function on $n\;(p*q)$ [\ref{class}].\\
+- Furthermore it has been shown that if the same plaintext message is sent to $e$ or more recipients and the receivers share the same exponent $e$, bit different $p$ and $q$, then the original plaintext can be easily decrypted using the Chinese Remainder Theorem [\ref{johan}].\\
+- RSA is a deterministic encryption algorithm so a chosen plaintext attack works against this cryptosystem. This would allow an attacker to encrypt like plaintexts under the public key and see if they are equal to the ciphertext.\\
+- Another property of RSA is that the product of two ciphertexts is equal to the product of the respective plaintexts. This makes it susceptible to a chosen ciphertext attack. An attacker that wants to know $c\equiv m^e\;(mod\;n))$ can ask the owner of the private key to decrypt the ciphertext $c'\equiv cr^e\;(mod\;n)$ where $r$ is some value chosen by the attacker. If the attack works the attacker will learn $mr\;(mod\;n)$ from which you can then derive $m$ [\ref{multi}].\\
+- The Common Modulus Attack is when Eve intercepts the public key being sent to Bob from Alice [\ref{class}]. Eve then alters the public key by one bit and sends that to Bob. Bob will then use the altered public key to encrypt his message and send it to Alice. Alice will be unable to encrypt the message so she will resend her key and Bob will send his message with the correct key. Now, $C_1\equiv M^{e_1}\;(mod\;n)$ and $C_2\equiv M^{e_2}\;(mod\;n)$ [\ref{class}]. If $e_1 \&e_2$ are relatively prime then there exists and $x\& y$ such that $e_1x+e_2y=1$. Then, $({C_1}^{-1})({C_2}^{y})=({C_1}^{x})({C_2}^{y})=({M^{e_1}}^{x})({M^{e_2}}^{y})'\equiv M\;(mod\;n)$.
+
+%%%%%
+\section{Vigen\`ere Cipher}
+
+\subsection{Description}
+The Vigen\`ere Cipher is a polyalphabetic cipher named after Blaise de Vigen\`ere who lived from $1523$ to $1596$ [\ref{class}]. Blaise did not actually invent the cipher, but he did create the autokey system which is an extension of the original Vigen\`ere Cipher [\ref{class}]. A cipher is polyalphabetic when it is based on substitution and using multiple alphabets to perform the substitutions. The Vigen\`ere cipher uses a series of interwoven Caesar ciphers that are based on the letters of a keyword. It is advantageous to use a polyalphabetic cipher because it avoids statistical attacks that monoalphabetic ciphers are prone to. Vigen\`ere ciphers can be easily encrypted and decrypted, with knowledge of the key, using a Vigen\`ere table. This is a table that has the alphabet written out $26$ times in different rows and each alphabet is shifted to the left compared to the previous row [\ref{class}]. To use it you use the column matching the plaintext letter and the row matching the key letter, and where they meet is the encrypted letter.To decrypt you take the letter of the key and find it's corresponding row and then find the column containing the matching ciphertext letter. That column is the corresponding decrypted letter.
+\begin{figure}[H]
+        \includegraphics[width=200pt]{table.png}
+        \caption{Vigen\`ere Table [\ref{table}]}
+        \label{fig:340}
+    \end{figure}
+The following is a walk through of the Vigen\`ere cipher [\ref{class}]:\\
+\begin{enumerate}
+    \item Bob and Alice must agree on a key phrase:\\
+        - They decide on the key: flamingo
+    \item Bob encrypts the plaintext:\\
+    - plaintext: \hspace{1.8mm} t h e r a i n i n s p a i n s t\\
+    - keyphrase: \hspace{.1mm} f l a m i n g o g l a m i n g o\\
+    - ciphertext:\hspace{1.2mm} y s e d i v t w s d p m q a y h 
+    \item Alice decrypts the ciphertext:\\
+    - ciphertext:\hspace{1.2mm} y s e d i v t w s d p m q a y h\\ 
+    - keyphrase: \hspace{.1mm} f l a m i n g o g l a m i n g o\\
+    - plaintext: \hspace{1.8mm} t h e r a i n i n s p a i n s t
+\end{enumerate}
+\subsection{Attacks}
+As mentioned above the main idea behind the Vigen\`ere cipher is to hide the plaintext letter frequency to avoid the easy deployment of frequency analysis [\ref{class}]. However, the main weakness of the Vigen\`ere cipher is that it's key repeats continuously over the plaintext. Thus, there are two main goals when attacking a Vigen\`ere cipher. The first is to find the key length and the second is to then find the key [\ref{class}]. If you can figure out the key length than you can treat each section as an individual Caesar cipher, which isn't unbelievably difficult to decrypt as seen earlier. William Friedman published a test that utilizes the index of coincidence to help determine the key length/number of alphabets [\ref{class}]. The index of coincidence, denoted IndCo($s$), of a string $s$ is the probability that two randomly chosen characters in String $s$ are identical [\ref{class}]. The length can be estimated as the following [\ref{class}]:\\
+$F_a=$ freq of $A$ in the string, $N=$length of the string
+\vspace{2mm}\\
+P(Choose the same letter twice in the string)$=\frac{F_a}{N}*\frac{F_a-1}{N-1}$
+\vspace{2mm}\\
+Over all letters we have:\\
+$IndCo(s)= \frac{\sum\limits_{i=A}^z F_i(F_i-1)}{N(N-1)}$
+\vspace{5mm}\\
+Another test to determine the key length was published by Officer Kasiski of the German Military in 1863 [\ref{class}]. In his test you look for repeated fragments within the ciphertext and compile a list of distances that separate the repetitions. The key is likely to divide many of these distances [\ref{class}]. As mentioned above once the key length is determined you can perform standard frequency analysis on the individual Caesar ciphers.
+
+%%%%%
+\section{Elliptic Curve Cryptography}
+
+\subsection{Description}
+In Elliptic Curve Cryptography (ECC) equations of the form $Y^2=X^3+AX+B$ are considered [\ref{class}]. An Elliptic curve E is the set of solutions to the equation of this form together with a point, denoted $\sigma$ and considered to be a point "at infinity", and where $4A^3+27B^2\neq0$ [\ref{class}]. This set together with the group operation of elliptic curves is a commutative group, with $\sigma$ as the identity element [\ref{class}]. The quantity $\Delta_E=4A^3+27B^2$ is called the discriminant of $E$ [\ref{class}]. Note that $\Delta_E \neq 0$ iff $e_1,e_2,e_3$ are distinct where $x^3+AX+B=(X-e_1)(X-e_2)(X-e_3)$ [\ref{class}]. Also, curves with roots whose multiplicity is greater than one (repeated roots) fail to work well with the additive law [\ref{class}]. There are ECC implementations of several different discrete logarithm based schemes but here we will be discussing the ECC version of ElGamal and it is as follows [\ref{class}]:\\ 
+\begin{enumerate}
+    \item Alice chooses $E:\;Y^2=X^3+AX+B\;(mod\;P)$, where $P$ is large prime and a point on $E$.
+    \item Alice chooses a random (private) number $s$ and computes $sP=P\bigoplus P \bigoplus P...\bigoplus P$\\
+    Alice publishes: $E,\;P,\;sP$
+    \item Bob prepares his message by converting it to $a\neq M$, adding bits at the end to guarantee that $M^3+AM+B\;(mod\;P)$ is a perfect square (corresponds to a point on $E$).
+    \item Bob picks a random (private) number $k\;(mod\;P)$.\\
+    Computes $kP\;(mod\;P)$ and $M\bigoplus ksP\;(mod\;P)$.\\
+    Bob publishes: $kP,\;M\bigoplus k(sP)$.
+    \item Alice computes $s(kP)$ then finds its inverse $-s(kP)$.\\
+    Alice computes: $[M\bigoplus k(sP)] - k(sP)\equiv M\;(mod\;P)$. 
+\end{enumerate}
+\subsection{Attacks}
+Most other discrete logarithm problem based systems can use the same procedure for squaring and multiplication, where the EC addition is significantly different for doubling and general addition depending on the coordinate system used. This leaves ECC vulnerable to side channel attacks where information is gained from the implementation of a computer rather than a direct weakness in ECC [\ref{wiki}]. There are concerns about backdoors being inserted by the National Security Agency into at least one elliptic curve based pseudo random generator. Leaks from Edward Snowden suggest that the NSA put a backdoor in the Dual EC DRBG standard [\ref{nicole}]. Furthermore, ECC is not quantum resistant and although it is not a major issue currently it becomes more of a concern with each passing year. Even the NSA announced in 2015 that in the near future it will be transitioning to ciphers that are resistant to quantum computers [\ref{nsa}].  
+%%%%%
+
+%%%%%
+\section{DES}
+
+\subsection{History}
+The Data Encryption Standard (DES) was created off of the initial work of Horst Feistel, an IBM employee, during the period 1973-74. The National Bureau of Standards, consulted by the NSA, held a competition for a cipher system to meet civilian needs, which was announced in 1973. The only algorithm that was deemed acceptable by the NSA and NBS was submitted by IBM and was the culmination of Feistel's work. DES made use of techniques not previously seen in a non-classified environment. The creation of DES also resulted in the unprecedented collaboration between IBM and the NSA. In 1977, DES was officially adopted as the standard and would remain so for decades. 
+\subsection{Description}
+The basic units of DES  are called "blocks". The algorithm works on 64 bits (8 characters) in a block [\ref{class}]. DES is an algorithm that takes a fixed-length string of plaintext and transforms it through a series of operations into another ciphertext string of the same length. It uses a key that is effectively 56 bits as 8 of the bits are used for error checking and then discarded [\ref{class}]. From the key $k$ we create $16$ keys, $k_1,...,k_{16}$. DES works in rounds and there are $16$ rounds, so each round uses one of the sixteen keys [\ref{class}]. Each round is as follows:\\
+\begin{figure}[H]
+        \includegraphics[width=200pt]{IMG_20191211_232141505.jpg}
+        \caption{One DES round [\ref{class}]}
+        \label{fig:340}
+    \end{figure}
+Where $f$ is the Feistel function, $k$ is the key, $L_0$ is half of the first block, and $R_0$ is the other half of the block [\ref{class}]. Decryption uses the same structure, but the keys are used in reverse order [\ref{class}]. 
+%%%%%
+
+%%%%%
+\section{One-time Pads}
+
+\subsection{History}
+Frank Miller was the first to describe the one-time pad system in 1882 with the purpose of securing telegraphy [\ref{markoff}]. In 1917, Gilbert Vernam invented a cipher based on teleprinter technology, where each character in a message was electrically combined with a character on a punched paper tape key. Captain Joseph Mauborgne of the US Army came to the realization that the character sequence on the key tape could be random, which would make cryptanalysis much harder. Together they developed the first one-time tape system [\ref{kahn}]. The paper pad system was the next development and came from the work of three German cryptographers Werner Kunze, Rudolf Schauffler, and Erich Langlotz. For a long time codes and phrases were converted to groups of numbers by using a codebook similar to a dictionary to send secret messages. They figured out that this system could never be broken if a random chosen additive number was used for every code group. They had multiple copies of paper pads with lines of random number groups. Each page had a serial number and eight lines. A person would use a page to encode a message and then destroy the page. They then could send the serial number with the message so that the recipient with a duplicate pad could reverse the order [\ref{kahn}]. Finally, in the 1940's Claude Shannon proved the theoretical significance of the one-time pad system [\ref{shannon}].  
+\subsection{Description}
+The one-time pad system is a system where both Alice and Bob have a pad of paper containing identical random sequences of letters. Alice chooses an unused page from the pad, and often there was a method for choosing the page that was arranged prior. The information on the chosen page is the key for the message. Every letter on the pad will be combined with one character of the message, and the way they were combined is also determined prior. A common way is to combine the key and the message using modular addition. Now all Bob has to decrypt the message is to use the same key page and do it in reverse [\ref{wiki2}].
+%%%%%
+
+%%%%%
+\section{Polybius Square}
+
+\subsection{History}
+The Polybius square was a device invented by the Ancient Greeks Cleoxenus and Democleitus, and was formalized by Polybius an Ancient Greek historian and scholar [\ref{polybius}].  Polybius didn't create this device with the intent of it being a cipher but instead for it to be an aid to telegraphy. He thought the symbols could be signalled using sets of torches or flags [\ref{rod}]. It has also been used in the form of a "knock code" to signal messages through knocking the number.
+\subsection{Description}
+The Polybius square is a very straight forward encoding where there is a grid, historically a $5x5$, with the plaintext alphabet in each slot. The coordinates of the plaintext letter is the encoding [\ref{rod}]. The following is an example of a Polybius square:\\
+\begin{figure}[H]
+        \includegraphics[width=200pt]{square.jpg}
+        \caption{The standard Polybius Square for English [\ref{rod}]}
+        \label{fig:340}
+    \end{figure}
+The Polybius square in it of itself is relatively insecure, but it offers the possibility of fractionation, which makes it a useful component in several other ciphers [\ref{wiki2}]. 
+%%%%%
+
+\newpage
+\begin{center}
+    \title{References}
+\end{center}
+\begin{enumerate}
+    \item \label{iastate} Allen, Bryce D. “Implementing Several Attacks on Plain ElGamal Encryption.” Iowa State University Capstones, Theses and Dissertations, 2008, doi:10.31274/etd-180810-1079.
+    \item \label{class}C. Class Notes.
+    \item \label{chicago} Calderbank, Michael. “The RSA Cryptosystem:  History, Algorithm, Primes.” Univeristy of Chicago, 20 Aug. 2007, www.math.uchicago.edu/\~may/\\VIGRE/VIGRE2007/REUPapers/FINALAPP/Calderbank.pdf.
+    \item \label{daileda} Daileda, R.C. “Diffie-Hellman Key Exchangeand the Discrete Log Problem.” Trinity University, Trinity University, 2018,\\ ramanujan.math.trinity.edu/rdaileda/teach/s18/m3341/lectures/discrete\_log.pdf.
+    \item \label{gamal} Elgamal, Taher. “A Public Key Cryptosystem and a Signature Scheme Based on Discrete Logarithms.” IEEE Transactions on Information Theory, vol. 31, no. 4, 1985, pp. 469–472., doi:10.1109/tit.1985.1057074.
+    \item \label{johan} Håstad, Johan (1986). "On using RSA with Low Exponent in a Public Key Network". Advances in Cryptology — CRYPTO '85 Proceedings. Lecture Notes in Computer Science. 218. pp. 403–408. doi:10.1007/3-540-39799-X\_29. ISBN 978-3-540-16463-0.
+    \item \label{kahn} Kahn, David (1967). The Codebreakers. Macmillan. pp. 398 ff. ISBN 978-0-684-83130-5.
+    \item \label{uicmath} Leon, Jeffrey S. “The ElGamal Public Key Encryption Algorithm.” University of Illinois at Chicago, 2014, homepages.math.uic.edu/~leon/mcs425-s08/handouts/el-gamal.pdf.
+    \item \label{markoff} Markoff, John. "Codebook Shows an Encryption Form Dates Back to Telegraphs". The New York Times. Archived from the original on May 21, 2013. Retrieved 2011-07-26.
+    \item \label{polybius} Polybius. "The Histories of Polybius", http://penelope.uchicago.edu/Thayer/E\\/Roman/Texts/Polybius/10*.html\#45.6
+    \item \label{rodriguez}Rodriguez-Clark, Daniel. “Monoalphabetic Substitution Ciphers.” Crypto Corner, crypto.interactive-maths.com/monoalphabetic-substitution-ciphers.html.
+    \item \label{rod} Rodriguez-Clark, Daniel. "Polybius Square", https://crypto.interactive-maths.com/polybius-square.html
+    \item \label{multi} SEJPM. “How Multiplicative Property of RSA Can Be Exploited.” Cryptography Stack Exchange, 9 Apr. 2015, crypto.stackexchange.com/questions/\\24880/how-multiplicative-property-of-rsa-can-be-exploited.
+    \item \label{shannon} Shannon, Claude (1949). "Communication Theory of Secrecy Systems" (PDF). Bell System Technical Journal. 28 (4): 656–715. 
+    \item \label{nicole} Perlroth, Nicole. "Government Announces Steps to Restore Confidence on Encryption Standards". NY Times – Bits Blog. 2013-09-10. Retrieved 2015-11-06.
+    \item \label{nsa} National Security Agency. "NSA Suite B Cryptography - NSA/CSS". web.archive.org. 2015-09-05. Retrieved 2019-06-05.
+    \item \label{simmons} Simmons, Gustavus J. “Substitution Cipher.” Encyclopædia 
+    \indent Britannica, Encyclopædia Britannica, Inc., 16 Aug. 2017, www.britannica.com/topic/substitution-cipher.
+    \item \label{tyler} tylerl. “‘Diffie-Hellman Key Exchange’ in Plain English.” Information Security Stack Exchange, StackExchange, 1 Feb. 2013, security.stackexchange.com/a/45971.
+    \item \label{wiki} Wikipedia. "Elliptic Curve Cryptography", retrieved December 11, 2019, https://en.wikipedia.org/wiki/Elliptic-curve\_cryptography\#Security.
+    \item \label{wiki2} Wikipedia. "One-time Pad", retrieved December 11, 2019, https://en.wikipedia.org\\/wiki/One-time\_pad\#Example.
+    \item \label{table} https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a\\/Vigen\%C3\%A8re\_square\_shading.svg/220px-Vigen\%C3\%A8re\_square\_shading.svg.png
+\end{enumerate}
+
+
 \end{document}
